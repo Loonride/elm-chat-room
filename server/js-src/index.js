@@ -53,8 +53,14 @@ function Message(id, location, message) {
     };
 };
 
+const inputPort = app.ports.inputPort;
+const outputPort = app.ports.outputPort;
+
+outputPort.subscribe((cmd) => {
+    console.log(cmd);
+});
+
 // app.ports.inputPort.send(Connection(uuid(), Location()));
-const obj = ["req","add",{"x":1,"y":2}];
+const obj = ["req","sent",{"sent": "abc"}];
 const msg = Message(uuid(), Location(), JSON.stringify(obj));
-console.log(msg);
-app.ports.inputPort.send(msg);
+inputPort.send(msg);

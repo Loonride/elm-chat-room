@@ -1,6 +1,6 @@
 port module Server exposing (..)
 
-import Json.Encode as JE exposing (Value)
+import Interface exposing (..)
 
 import WebSocketFramework.Server
     exposing
@@ -19,14 +19,9 @@ import WebSocketFramework.Types
         , InputPort
         , OutputPort
         , ServerState
-        , Plist
-        , ReqRsp(..)
         )
 
 import WebSocketFramework exposing (decodePlist, unknownMessage)
-
-type alias Message =
-    ()
 
 type alias ServerModel =
     ()
@@ -35,37 +30,12 @@ serverModel : ServerModel
 serverModel =
     ()
 
-type alias GameState =
-    ()
-
-type alias Player =
-    String
-
-messageEncoder : Message -> ( ReqRsp, Plist )
-messageEncoder message =
-    ( Rsp "result"
-    , [ ( "result", JE.string "result" )
-        ]
-    )
-
-messageDecoder : ( ReqRsp, Plist ) -> Result String Message
-messageDecoder ( reqrsp, plist ) =
-    let
-        _ = Debug.log "messageDecoder" ()
-    in unknownMessage reqrsp
-
 encodeDecode : EncodeDecode Message
 encodeDecode =
     { encoder = messageEncoder
     , decoder = messageDecoder
     , errorWrapper = Nothing
     }
-
-messageProcessor : ServerState GameState Player -> Message -> ( ServerState GameState Player, Maybe Message )
-messageProcessor state message =
-    let
-        _ = Debug.log "messageProcessor" ()
-    in (state, Nothing)
 
 messageSender : ServerMessageSender ServerModel Message GameState Player
 messageSender model socket state request response =
