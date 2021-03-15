@@ -1,0 +1,16 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "elm make elm-src/Server.elm --output ./elm-output/server.js",
+    "dev": "node js-src/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "uuid": "^8.3.2",
+    "ws": "^7.4.4"
+  }
+}
