@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "elm make elm-src/Server.elm --output ./elm-output/server.js",
+    "build:client": "elm make elm-src/Client/Client.elm --output ./www/client.js",
+    "build:server": "elm make elm-src/Server.elm --output ./elm-output/server.js",
+    "build": "npm run build:client && npm run build:server",
     "dev": "node js-src/index.js"
   },
   "author": "",
