@@ -1,62 +1,73 @@
 port module Server exposing (..)
 
-import Interface exposing (..)
+import Shared.Interface exposing (..)
 
-import WebSocketFramework.Server
-    exposing
-        ( ServerMessageSender
-        , UserFunctions
-        , program
-        , sendToOne
-        , verbose
-        )
+import Platform
+import Json.Decode as JD exposing (Decoder)
+import Json.Encode as JE exposing (Value)
 
-import WebSocketFramework.Types
-    exposing
-        ( EncodeDecode
-        , Error
-        , ErrorKind(..)
-        , InputPort
-        , OutputPort
-        , ServerState
-        )
+type alias Flags = ()
 
-import WebSocketFramework exposing (decodePlist, unknownMessage)
+type Msg
+  = Noop
+  | IncomingRawData String
 
-type alias ServerModel =
-    ()
+type alias Model = { state: State }
 
-serverModel : ServerModel
-serverModel =
-    ()
+initModel = { state = initState }
 
-encodeDecode : EncodeDecode Message
-encodeDecode =
-    { encoder = messageEncoder
-    , decoder = messageDecoder
-    , errorWrapper = Nothing
+main : Program Flags Model Msg
+main =
+  Platform.worker
+    { init = init
+    , update = update
+    , subscriptions = subscriptions
     }
 
-messageSender : ServerMessageSender ServerModel Message GameState Player
-messageSender model socket state request response =
-    ( model, sendToOne messageEncoder response outputPort socket )
+init : Flags -> (Model, Cmd Msg)
+init () =
+  (initModel, Cmd.none)
 
-userFunctions : UserFunctions ServerModel Message GameState Player
-userFunctions =
-    { encodeDecode = encodeDecode
-    , messageProcessor = messageProcessor
-    , messageSender = messageSender
-    , messageToGameid = Nothing
-    , messageToPlayerid = Nothing
-    , autoDeleteGame = Nothing
-    , gamesDeleter = Nothing
-    , playersDeleter = Nothing
-    , inputPort = inputPort
-    , outputPort = outputPort
-    }
+update : Msg -> Model -> (Model, Cmd Msg)
+update msg model =
+  case msg of
+    Noop ->
+      (model, outputPort "abc")
+    IncomingRawData s ->
+      case JD.decodeString incomingDataDecoder s of
+        Ok data ->
+          case data.dataType of
+            "connection" -> connection data model
+            "disconnection" -> disconnection data model
+            "nickname" -> (model, Cmd.none)
+            "message" -> (model, Cmd.none)
+            _ -> (model, Cmd.none)
+        Err e -> (model, Cmd.none)
 
-main = program serverModel userFunctions (Just True)
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.batch
+    [ inputPort IncomingRawData
+    ]
 
-port inputPort : InputPort msg
+connection : IncomingData -> Model -> (Model, Cmd Msg)
+connection data model =
+  let
+    newUser = User data.uuid ""
+    oldState = model.state
+    newState = { oldState | users = newUser :: oldState.users }
+  in
+    ({ model | state = newState }, sendState newState)
 
-port outputPort : OutputPort msg
+disconnection : IncomingData -> Model -> (Model, Cmd Msg)
+disconnection data model =
+  let
+    _ = Debug.log "connection" data.uuid
+  in
+    (model, Cmd.none)
+
+sendState : State -> Cmd msg
+sendState s = outputPort (JE.encode 0 (stateEncoder s))
+
+port inputPort : (String -> msg) -> Sub msg
+port outputPort : String -> Cmd msg

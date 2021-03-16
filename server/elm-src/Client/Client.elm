@@ -4,7 +4,8 @@ import Shared.Interface exposing (..)
 
 import Browser
 import Browser.Events
-import Json.Decode as Decode
+import Json.Decode as JD exposing (Decoder)
+import Json.Encode as JE exposing (Value)
 import Html exposing (Html, button, input, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)

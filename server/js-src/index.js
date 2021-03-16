@@ -1,7 +1,7 @@
 const url = require('url');
 const uuid = require('uuid').v4;
 
-const app = require('../elm-output/server').Elm.Server2.init({
+const app = require('../elm-output/server').Elm.Server.init({
     flags: null,
 });
 
