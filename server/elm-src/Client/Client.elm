@@ -6,10 +6,9 @@ import Browser
 import Browser.Events
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
-import Html exposing (Html, button, input, text)
+import Html exposing (Html, button, input, text, div)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
-import WebSocketFramework.Types exposing (OutputPort)
 
 type alias Flags = ()
 
@@ -42,10 +41,12 @@ update msg model =
     Noop ->
       (model, Cmd.none)
     IncomingRawData s ->
-      let
-        _ = Debug.log s ()
-      in
-        (model, Cmd.none)
+      case JD.decodeString dataDecoder s of
+        Ok data ->
+          case data.dataType of
+            "state" -> (updateState model data.data, Cmd.none)
+            _ -> (model, Cmd.none)
+        Err e -> (model, Cmd.none)
     InputChange s ->
       ({ model | inputContent = s }, Cmd.none)
     SendClick ->
@@ -63,15 +64,28 @@ view model =
       
       box = input [ placeholder "Say hello...", value model.inputContent, onInput InputChange ] []
       btn = button [ onClick SendClick ] [ text "Send" ]
+      users = div [] [ text (Debug.toString model.state.users) ]
+      messages = div [] [ text (Debug.toString model.state.messages) ]
     in
       
-      Html.div (List.map (\(k, v) -> style k v) styles) [box, btn]
+      div (List.map (\(k, v) -> style k v) styles)
+        [ box
+        , btn
+        , users
+        , messages
+        ]
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
     [ inputPort IncomingRawData
     ]
+
+updateState : Model -> String -> Model
+updateState model rawStateData =
+  case JD.decodeString stateDecoder rawStateData of
+      Ok newState -> { model | state = newState }
+      Err e -> model
 
 port inputPort : (String -> msg) -> Sub msg
 port outputPort : String -> Cmd msg

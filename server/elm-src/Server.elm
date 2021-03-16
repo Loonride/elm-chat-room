@@ -3,8 +3,8 @@ port module Server exposing (..)
 import Shared.Interface exposing (..)
 
 import Platform
-import Json.Decode as JD exposing (Decoder)
-import Json.Encode as JE exposing (Value)
+import Json.Decode as JD
+import Json.Encode as JE
 
 type alias Flags = ()
 
@@ -34,7 +34,7 @@ update msg model =
     Noop ->
       (model, outputPort "abc")
     IncomingRawData s ->
-      case JD.decodeString incomingDataDecoder s of
+      case JD.decodeString dataDecoder s of
         Ok data ->
           case data.dataType of
             "connection" -> connection data model
@@ -50,7 +50,7 @@ subscriptions model =
     [ inputPort IncomingRawData
     ]
 
-connection : IncomingData -> Model -> (Model, Cmd Msg)
+connection : Data -> Model -> (Model, Cmd Msg)
 connection data model =
   let
     newUser = User data.uuid ""
@@ -59,7 +59,7 @@ connection data model =
   in
     ({ model | state = newState }, sendState newState)
 
-disconnection : IncomingData -> Model -> (Model, Cmd Msg)
+disconnection : Data -> Model -> (Model, Cmd Msg)
 disconnection data model =
   let
     _ = Debug.log "connection" data.uuid
@@ -67,7 +67,11 @@ disconnection data model =
     (model, Cmd.none)
 
 sendState : State -> Cmd msg
-sendState s = outputPort (JE.encode 0 (stateEncoder s))
+sendState s =
+  let
+    stateData = JE.encode 0 (stateEncoder s)
+  in
+    outputPort (JE.encode 0 (simpleDataEncoder "state" stateData))
 
 port inputPort : (String -> msg) -> Sub msg
 port outputPort : String -> Cmd msg

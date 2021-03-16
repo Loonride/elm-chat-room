@@ -5164,9 +5164,68 @@ var $author$project$Client$Client$subscriptions = function (model) {
 				$author$project$Client$Client$inputPort($author$project$Client$Client$IncomingRawData)
 			]));
 };
-var $elm$core$Debug$log = _Debug_log;
+var $author$project$Shared$Interface$Data = F3(
+	function (dataType, uuid, data) {
+		return {data: data, dataType: dataType, uuid: uuid};
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$map3 = _Json_map3;
+var $author$project$Shared$Interface$dataDecoder = A4(
+	$elm$json$Json$Decode$map3,
+	$author$project$Shared$Interface$Data,
+	A2($elm$json$Json$Decode$field, 'dataType', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'uuid', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'data', $elm$json$Json$Decode$string));
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Client$Client$outputPort = _Platform_outgoingPort('outputPort', $elm$json$Json$Encode$string);
+var $author$project$Shared$Interface$State = F2(
+	function (users, messages) {
+		return {messages: messages, users: users};
+	});
+var $author$project$Shared$Interface$ChatMessage = F2(
+	function (user, text) {
+		return {text: text, user: user};
+	});
+var $author$project$Shared$Interface$User = F2(
+	function (uuid, nickname) {
+		return {nickname: nickname, uuid: uuid};
+	});
+var $author$project$Shared$Interface$userDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Shared$Interface$User,
+	A2($elm$json$Json$Decode$field, 'uuid', $elm$json$Json$Decode$string),
+	A2($elm$json$Json$Decode$field, 'nickname', $elm$json$Json$Decode$string));
+var $author$project$Shared$Interface$chatMessageDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Shared$Interface$ChatMessage,
+	A2($elm$json$Json$Decode$field, 'user', $author$project$Shared$Interface$userDecoder),
+	A2($elm$json$Json$Decode$field, 'text', $elm$json$Json$Decode$string));
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $author$project$Shared$Interface$stateDecoder = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Shared$Interface$State,
+	A2(
+		$elm$json$Json$Decode$field,
+		'users',
+		$elm$json$Json$Decode$list($author$project$Shared$Interface$userDecoder)),
+	A2(
+		$elm$json$Json$Decode$field,
+		'messages',
+		$elm$json$Json$Decode$list($author$project$Shared$Interface$chatMessageDecoder)));
+var $author$project$Client$Client$updateState = F2(
+	function (model, rawStateData) {
+		var _v0 = A2($elm$json$Json$Decode$decodeString, $author$project$Shared$Interface$stateDecoder, rawStateData);
+		if (_v0.$ === 'Ok') {
+			var newState = _v0.a;
+			return _Utils_update(
+				model,
+				{state: newState});
+		} else {
+			var e = _v0.a;
+			return model;
+		}
+	});
 var $author$project$Client$Client$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -5174,8 +5233,21 @@ var $author$project$Client$Client$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'IncomingRawData':
 				var s = msg.a;
-				var _v1 = A2($elm$core$Debug$log, s, _Utils_Tuple0);
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Shared$Interface$dataDecoder, s);
+				if (_v1.$ === 'Ok') {
+					var data = _v1.a;
+					var _v2 = data.dataType;
+					if (_v2 === 'state') {
+						return _Utils_Tuple2(
+							A2($author$project$Client$Client$updateState, model, data.data),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					}
+				} else {
+					var e = _v1.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
 			case 'InputChange':
 				var s = msg.a;
 				return _Utils_Tuple2(
@@ -5226,7 +5298,6 @@ var $elm$html$Html$Events$stopPropagationOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
@@ -5257,9 +5328,26 @@ var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$Debug$toString = _Debug_toString;
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Client$Client$view = function (model) {
+	var users = A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$text(
+				$elm$core$Debug$toString(model.state.users))
+			]));
 	var styles = _List_Nil;
+	var messages = A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$text(
+				$elm$core$Debug$toString(model.state.messages))
+			]));
 	var btn = A2(
 		$elm$html$Html$button,
 		_List_fromArray(
@@ -5290,7 +5378,7 @@ var $author$project$Client$Client$view = function (model) {
 			},
 			styles),
 		_List_fromArray(
-			[box, btn]));
+			[box, btn, users, messages]));
 };
 var $author$project$Client$Client$main = $elm$browser$Browser$element(
 	{init: $author$project$Client$Client$init, subscriptions: $author$project$Client$Client$subscriptions, update: $author$project$Client$Client$update, view: $author$project$Client$Client$view});

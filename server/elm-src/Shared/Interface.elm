@@ -3,7 +3,7 @@ module Shared.Interface exposing (..)
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
 
-type alias IncomingData = { dataType: String, uuid: String, data: String }
+type alias Data = { dataType: String, uuid: String, data: String }
 
 type alias User = { uuid: String, nickname: String }
 
@@ -13,12 +13,27 @@ type alias State = { users: List User, messages: List ChatMessage }
 
 initState = { users = [], messages = [] }
 
-incomingDataDecoder : Decoder IncomingData
-incomingDataDecoder =
-  JD.map3 IncomingData
+dataDecoder : Decoder Data
+dataDecoder =
+  JD.map3 Data
     (JD.field "dataType" JD.string)
     (JD.field "uuid" JD.string)
     (JD.field "data" JD.string)
+
+dataEncoder : Data -> Value
+dataEncoder data =
+  JE.object
+    [ ( "dataType", JE.string data.dataType )
+    , ( "uuid", JE.string data.uuid )
+    , ( "data", JE.string data.data )
+    ]
+
+simpleDataEncoder : String -> String -> Value
+simpleDataEncoder dataType containedData =
+  let
+    finalData = Data dataType "" containedData
+  in
+    dataEncoder finalData
 
 userDecoder : Decoder User
 userDecoder =
@@ -58,7 +73,3 @@ stateEncoder state =
     [ ( "users", JE.list userEncoder state.users )
     , ( "messages", JE.list chatMessageEncoder state.messages )
     ]
-
--- chatMessageDecoder : Decoder ChatMessage
-
--- dataEncoder : 
