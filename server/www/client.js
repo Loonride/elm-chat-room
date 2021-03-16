@@ -5150,28 +5150,28 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Client$Client$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Client$Client$initModel, $elm$core$Platform$Cmd$none);
 };
-var $author$project$Client$Client$ReceiveMessage = function (a) {
-	return {$: 'ReceiveMessage', a: a};
+var $author$project$Client$Client$IncomingRawData = function (a) {
+	return {$: 'IncomingRawData', a: a};
 };
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Client$Client$receiveMessage = _Platform_incomingPort('receiveMessage', $elm$json$Json$Decode$string);
+var $author$project$Client$Client$inputPort = _Platform_incomingPort('inputPort', $elm$json$Json$Decode$string);
 var $author$project$Client$Client$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				$author$project$Client$Client$receiveMessage($author$project$Client$Client$ReceiveMessage)
+				$author$project$Client$Client$inputPort($author$project$Client$Client$IncomingRawData)
 			]));
 };
 var $elm$core$Debug$log = _Debug_log;
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Client$Client$sendMessage = _Platform_outgoingPort('sendMessage', $elm$json$Json$Encode$string);
+var $author$project$Client$Client$outputPort = _Platform_outgoingPort('outputPort', $elm$json$Json$Encode$string);
 var $author$project$Client$Client$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'Noop':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'ReceiveMessage':
+			case 'IncomingRawData':
 				var s = msg.a;
 				var _v1 = A2($elm$core$Debug$log, s, _Utils_Tuple0);
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -5185,7 +5185,7 @@ var $author$project$Client$Client$update = F2(
 			default:
 				return _Utils_Tuple2(
 					model,
-					$author$project$Client$Client$sendMessage(model.inputContent));
+					$author$project$Client$Client$outputPort(model.inputContent));
 		}
 	});
 var $author$project$Client$Client$InputChange = function (a) {

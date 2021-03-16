@@ -6,12 +6,13 @@ import Json.Decode as Decode
 import Html exposing (Html, button, input, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import WebSocketFramework.Types exposing (OutputPort)
 
 type alias Flags = ()
 
 type Msg
   = Noop
-  | ReceiveMessage String
+  | IncomingRawData String
   | InputChange String
   | SendClick
 
@@ -37,7 +38,7 @@ update msg model =
   case msg of
     Noop ->
       (model, Cmd.none)
-    ReceiveMessage s ->
+    IncomingRawData s ->
       let
         _ = Debug.log s ()
       in
@@ -45,7 +46,7 @@ update msg model =
     InputChange s ->
       ({ model | inputContent = s }, Cmd.none)
     SendClick ->
-      (model, sendMessage model.inputContent)
+      (model, outputPort model.inputContent)
 
 view : Model -> Html Msg
 view model =
@@ -66,8 +67,8 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
-    [ receiveMessage ReceiveMessage
+    [ inputPort IncomingRawData
     ]
 
-port sendMessage : String -> Cmd msg
-port receiveMessage : (String -> msg) -> Sub msg
+port inputPort : (String -> msg) -> Sub msg
+port outputPort : String -> Cmd msg
