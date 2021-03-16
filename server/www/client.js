@@ -5144,8 +5144,10 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Shared$Interface$initState = {messages: _List_Nil, users: _List_Nil};
-var $author$project$Client$Client$initModel = {inputContent: '', state: $author$project$Shared$Interface$initState};
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $author$project$Shared$Interface$initState = {messages: _List_Nil, users: $elm$core$Dict$empty};
+var $author$project$Client$Client$initModel = {messageContent: '', nicknameContent: '', state: $author$project$Shared$Interface$initState};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Client$Client$init = function (_v0) {
@@ -5177,7 +5179,47 @@ var $author$project$Shared$Interface$dataDecoder = A4(
 	A2($elm$json$Json$Decode$field, 'uuid', $elm$json$Json$Decode$string),
 	A2($elm$json$Json$Decode$field, 'data', $elm$json$Json$Decode$string));
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
 var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Shared$Interface$dataEncoder = function (data) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'dataType',
+				$elm$json$Json$Encode$string(data.dataType)),
+				_Utils_Tuple2(
+				'uuid',
+				$elm$json$Json$Encode$string(data.uuid)),
+				_Utils_Tuple2(
+				'data',
+				$elm$json$Json$Encode$string(data.data))
+			]));
+};
+var $author$project$Shared$Interface$simpleDataEncoder = F2(
+	function (dataType, containedData) {
+		var finalData = A3($author$project$Shared$Interface$Data, dataType, '', containedData);
+		return $author$project$Shared$Interface$dataEncoder(finalData);
+	});
+var $author$project$Shared$Interface$makeOutput = F2(
+	function (dataType, data) {
+		return A2(
+			$elm$json$Json$Encode$encode,
+			0,
+			A2($author$project$Shared$Interface$simpleDataEncoder, dataType, data));
+	});
 var $author$project$Client$Client$outputPort = _Platform_outgoingPort('outputPort', $elm$json$Json$Encode$string);
 var $author$project$Shared$Interface$State = F2(
 	function (users, messages) {
@@ -5201,6 +5243,134 @@ var $author$project$Shared$Interface$chatMessageDecoder = A3(
 	$author$project$Shared$Interface$ChatMessage,
 	A2($elm$json$Json$Decode$field, 'user', $author$project$Shared$Interface$userDecoder),
 	A2($elm$json$Json$Decode$field, 'text', $elm$json$Json$Decode$string));
+var $elm$core$Dict$Black = {$: 'Black'};
+var $elm$core$Dict$RBNode_elm_builtin = F5(
+	function (a, b, c, d, e) {
+		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
+	});
+var $elm$core$Dict$Red = {$: 'Red'};
+var $elm$core$Dict$balance = F5(
+	function (color, key, value, left, right) {
+		if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Red')) {
+			var _v1 = right.a;
+			var rK = right.b;
+			var rV = right.c;
+			var rLeft = right.d;
+			var rRight = right.e;
+			if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+				var _v3 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var lLeft = left.d;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					key,
+					value,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					rK,
+					rV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, left, rLeft),
+					rRight);
+			}
+		} else {
+			if ((((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) && (left.d.$ === 'RBNode_elm_builtin')) && (left.d.a.$ === 'Red')) {
+				var _v5 = left.a;
+				var lK = left.b;
+				var lV = left.c;
+				var _v6 = left.d;
+				var _v7 = _v6.a;
+				var llK = _v6.b;
+				var llV = _v6.c;
+				var llLeft = _v6.d;
+				var llRight = _v6.e;
+				var lRight = left.e;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Red,
+					lK,
+					lV,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, key, value, lRight, right));
+			} else {
+				return A5($elm$core$Dict$RBNode_elm_builtin, color, key, value, left, right);
+			}
+		}
+	});
+var $elm$core$Basics$compare = _Utils_compare;
+var $elm$core$Dict$insertHelp = F3(
+	function (key, value, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, $elm$core$Dict$RBEmpty_elm_builtin, $elm$core$Dict$RBEmpty_elm_builtin);
+		} else {
+			var nColor = dict.a;
+			var nKey = dict.b;
+			var nValue = dict.c;
+			var nLeft = dict.d;
+			var nRight = dict.e;
+			var _v1 = A2($elm$core$Basics$compare, key, nKey);
+			switch (_v1.$) {
+				case 'LT':
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						A3($elm$core$Dict$insertHelp, key, value, nLeft),
+						nRight);
+				case 'EQ':
+					return A5($elm$core$Dict$RBNode_elm_builtin, nColor, nKey, value, nLeft, nRight);
+				default:
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						nLeft,
+						A3($elm$core$Dict$insertHelp, key, value, nRight));
+			}
+		}
+	});
+var $elm$core$Dict$insert = F3(
+	function (key, value, dict) {
+		var _v0 = A3($elm$core$Dict$insertHelp, key, value, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
+var $elm$json$Json$Decode$keyValuePairs = _Json_decodeKeyValuePairs;
+var $elm$json$Json$Decode$dict = function (decoder) {
+	return A2(
+		$elm$json$Json$Decode$map,
+		$elm$core$Dict$fromList,
+		$elm$json$Json$Decode$keyValuePairs(decoder));
+};
 var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Shared$Interface$stateDecoder = A3(
 	$elm$json$Json$Decode$map2,
@@ -5208,7 +5378,7 @@ var $author$project$Shared$Interface$stateDecoder = A3(
 	A2(
 		$elm$json$Json$Decode$field,
 		'users',
-		$elm$json$Json$Decode$list($author$project$Shared$Interface$userDecoder)),
+		$elm$json$Json$Decode$dict($author$project$Shared$Interface$userDecoder)),
 	A2(
 		$elm$json$Json$Decode$field,
 		'messages',
@@ -5248,21 +5418,33 @@ var $author$project$Client$Client$update = F2(
 					var e = _v1.a;
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
-			case 'InputChange':
+			case 'MessageChange':
 				var s = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{inputContent: s}),
+						{messageContent: s}),
 					$elm$core$Platform$Cmd$none);
+			case 'NicknameChange':
+				var s = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{nicknameContent: s}),
+					$author$project$Client$Client$outputPort(
+						A2($author$project$Shared$Interface$makeOutput, 'nickname', s)));
 			default:
 				return _Utils_Tuple2(
 					model,
-					$author$project$Client$Client$outputPort(model.inputContent));
+					$author$project$Client$Client$outputPort(
+						A2($author$project$Shared$Interface$makeOutput, 'message', model.messageContent)));
 		}
 	});
-var $author$project$Client$Client$InputChange = function (a) {
-	return {$: 'InputChange', a: a};
+var $author$project$Client$Client$MessageChange = function (a) {
+	return {$: 'MessageChange', a: a};
+};
+var $author$project$Client$Client$NicknameChange = function (a) {
+	return {$: 'NicknameChange', a: a};
 };
 var $author$project$Client$Client$SendClick = {$: 'SendClick'};
 var $elm$html$Html$button = _VirtualDom_node('button');
@@ -5340,6 +5522,24 @@ var $author$project$Client$Client$view = function (model) {
 				$elm$core$Debug$toString(model.state.users))
 			]));
 	var styles = _List_Nil;
+	var nickBox = A2(
+		$elm$html$Html$input,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$placeholder('Set nickname'),
+				$elm$html$Html$Attributes$value(model.nicknameContent),
+				$elm$html$Html$Events$onInput($author$project$Client$Client$NicknameChange)
+			]),
+		_List_Nil);
+	var msgBox = A2(
+		$elm$html$Html$input,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$placeholder('Say hello...'),
+				$elm$html$Html$Attributes$value(model.messageContent),
+				$elm$html$Html$Events$onInput($author$project$Client$Client$MessageChange)
+			]),
+		_List_Nil);
 	var messages = A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -5358,15 +5558,6 @@ var $author$project$Client$Client$view = function (model) {
 			[
 				$elm$html$Html$text('Send')
 			]));
-	var box = A2(
-		$elm$html$Html$input,
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$placeholder('Say hello...'),
-				$elm$html$Html$Attributes$value(model.inputContent),
-				$elm$html$Html$Events$onInput($author$project$Client$Client$InputChange)
-			]),
-		_List_Nil);
 	return A2(
 		$elm$html$Html$div,
 		A2(
@@ -5378,7 +5569,20 @@ var $author$project$Client$Client$view = function (model) {
 			},
 			styles),
 		_List_fromArray(
-			[box, btn, users, messages]));
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[nickBox])),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[msgBox, btn])),
+				users,
+				messages
+			]));
 };
 var $author$project$Client$Client$main = $elm$browser$Browser$element(
 	{init: $author$project$Client$Client$init, subscriptions: $author$project$Client$Client$subscriptions, update: $author$project$Client$Client$update, view: $author$project$Client$Client$view});

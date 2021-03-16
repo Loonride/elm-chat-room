@@ -15,12 +15,13 @@ type alias Flags = ()
 type Msg
   = Noop
   | IncomingRawData String
-  | InputChange String
+  | MessageChange String
+  | NicknameChange String
   | SendClick
 
-type alias Model = { inputContent: String, state: State }
+type alias Model = { messageContent: String, nicknameContent: String, state: State }
 
-initModel = { inputContent = "", state = initState }
+initModel = { messageContent = "", nicknameContent = "", state = initState }
 
 main : Program Flags Model Msg
 main =
@@ -47,10 +48,12 @@ update msg model =
             "state" -> (updateState model data.data, Cmd.none)
             _ -> (model, Cmd.none)
         Err e -> (model, Cmd.none)
-    InputChange s ->
-      ({ model | inputContent = s }, Cmd.none)
+    MessageChange s ->
+      ({ model | messageContent = s }, Cmd.none)
+    NicknameChange s ->
+      ({ model | nicknameContent = s }, outputPort (makeOutput "nickname" s))
     SendClick ->
-      (model, outputPort model.inputContent)
+      (model, outputPort (makeOutput "message" model.messageContent))
 
 view : Model -> Html Msg
 view model =
@@ -62,15 +65,16 @@ view model =
         -- , ("transform", "translate(-50%, -50%)")
         -- ]
       
-      box = input [ placeholder "Say hello...", value model.inputContent, onInput InputChange ] []
+      nickBox = input [ placeholder "Set nickname", value model.nicknameContent, onInput NicknameChange ] []
+      msgBox = input [ placeholder "Say hello...", value model.messageContent, onInput MessageChange ] []
       btn = button [ onClick SendClick ] [ text "Send" ]
       users = div [] [ text (Debug.toString model.state.users) ]
       messages = div [] [ text (Debug.toString model.state.messages) ]
     in
       
       div (List.map (\(k, v) -> style k v) styles)
-        [ box
-        , btn
+        [ div [] [nickBox]
+        , div [] [msgBox, btn]
         , users
         , messages
         ]

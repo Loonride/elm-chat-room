@@ -2,8 +2,12 @@ const app = Elm.Client.Client.init({
     node: document.getElementById('elm'),
 });
 
-app.ports.outputPort.subscribe(function (str) {
-    console.log(str);
-});
+const ws = new WebSocket('ws://localhost:8000');
 
-// app.ports.inputPort.send();
+ws.onmessage = (msg) => {
+    app.ports.inputPort.send(msg.data);
+};
+
+app.ports.outputPort.subscribe((s) => {
+    ws.send(s);
+});

@@ -3,6 +3,7 @@ port module Server exposing (..)
 import Shared.Interface exposing (..)
 
 import Platform
+import Dict
 import Json.Decode as JD
 import Json.Encode as JE
 
@@ -55,23 +56,24 @@ connection data model =
   let
     newUser = User data.uuid ""
     oldState = model.state
-    newState = { oldState | users = newUser :: oldState.users }
+    newState = { oldState | users = Dict.insert newUser.uuid newUser oldState.users }
   in
     ({ model | state = newState }, sendState newState)
 
 disconnection : Data -> Model -> (Model, Cmd Msg)
 disconnection data model =
   let
-    _ = Debug.log "connection" data.uuid
+    oldState = model.state
+    newState = { oldState | users = Dict.remove data.uuid oldState.users }
   in
-    (model, Cmd.none)
+    ({ model | state = newState }, sendState newState)
 
 sendState : State -> Cmd msg
 sendState s =
   let
     stateData = JE.encode 0 (stateEncoder s)
   in
-    outputPort (JE.encode 0 (simpleDataEncoder "state" stateData))
+    outputPort (makeOutput "state" stateData)
 
 port inputPort : (String -> msg) -> Sub msg
 port outputPort : String -> Cmd msg

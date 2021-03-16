@@ -1,17 +1,20 @@
 module Shared.Interface exposing (..)
 
+import Dict
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
 
-type alias Data = { dataType: String, uuid: String, data: String }
+type alias UUID = String
 
-type alias User = { uuid: String, nickname: String }
+type alias Data = { dataType: String, uuid: UUID, data: String }
+
+type alias User = { uuid: UUID, nickname: String }
 
 type alias ChatMessage = { user: User, text: String }
 
-type alias State = { users: List User, messages: List ChatMessage }
+type alias State = { users: Dict.Dict UUID User, messages: List ChatMessage }
 
-initState = { users = [], messages = [] }
+initState = { users = Dict.empty, messages = [] }
 
 dataDecoder : Decoder Data
 dataDecoder =
@@ -64,12 +67,15 @@ chatMessageEncoder chatMessage =
 stateDecoder : Decoder State
 stateDecoder =
   JD.map2 State
-    (JD.field "users" (JD.list userDecoder))
+    (JD.field "users" (JD.dict userDecoder))
     (JD.field "messages" (JD.list chatMessageDecoder))
 
 stateEncoder : State -> Value
 stateEncoder state =
   JE.object
-    [ ( "users", JE.list userEncoder state.users )
+    [ ( "users", JE.dict identity userEncoder state.users )
     , ( "messages", JE.list chatMessageEncoder state.messages )
     ]
+
+makeOutput : String -> String -> String
+makeOutput dataType data = (JE.encode 0 (simpleDataEncoder dataType data))
