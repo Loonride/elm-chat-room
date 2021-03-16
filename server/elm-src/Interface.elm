@@ -7,7 +7,7 @@ import WebSocketFramework exposing (decodePlist, unknownMessage)
 import WebSocketFramework.Types exposing (Plist, ReqRsp(..), ServerState)
 
 type alias GameState =
-    ()
+    Bool
 
 type alias Player =
     String
@@ -59,7 +59,10 @@ messageDecoder ( reqrsp, plist ) =
 
 messageProcessor : ServerState GameState Player -> Message -> ( ServerState GameState Player, Maybe Message )
 messageProcessor state message =
-    case message of
+    let
+        _ = Debug.log "" state
+    in
+        case message of
         SentMessage str ->
             ( state
             , Just (ResultMessage "hello world")

@@ -55,7 +55,7 @@ userFunctions =
     , outputPort = outputPort
     }
 
-main = program serverModel userFunctions Nothing
+main = program serverModel userFunctions (Just True)
 
 port inputPort : InputPort msg
 

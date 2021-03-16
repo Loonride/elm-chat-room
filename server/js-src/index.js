@@ -60,7 +60,7 @@ outputPort.subscribe((cmd) => {
     console.log(cmd);
 });
 
-// app.ports.inputPort.send(Connection(uuid(), Location()));
+inputPort.send(Connection(uuid(), Location()));
 const obj = ["req","sent",{"sent": "abc"}];
 const msg = Message(uuid(), Location(), JSON.stringify(obj));
 inputPort.send(msg);

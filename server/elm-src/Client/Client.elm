@@ -9,9 +9,15 @@ import Html.Events exposing (onClick, onInput)
 
 type alias Flags = ()
 
-init : Flags -> (Model, Cmd Msg)
-init () =
-  (initModel, Cmd.none)
+type Msg
+  = Noop
+  | ReceiveMessage String
+  | InputChange String
+  | SendClick
+
+type alias Model = { inputContent: String }
+
+initModel = { inputContent = "" }
 
 main : Program Flags Model Msg
 main =
@@ -22,15 +28,9 @@ main =
     , subscriptions = subscriptions
     }
 
-type alias Model = { inputContent: String, count: Int }
-
-initModel = { inputContent = "", count = 0 }
-
-type Msg
-  = Noop
-  | ReceiveMessage String
-  | InputChange String
-  | SendClick
+init : Flags -> (Model, Cmd Msg)
+init () =
+  (initModel, Cmd.none)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -56,8 +56,6 @@ view model =
         -- , ("left", "50%")
         -- , ("transform", "translate(-50%, -50%)")
         -- ]
-      display =
-        Html.text ("Count: " ++ Debug.toString model.count)
       
       box = input [ placeholder "Say hello...", value model.inputContent, onInput InputChange ] []
       btn = button [ onClick SendClick ] [ text "Send" ]

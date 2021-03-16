@@ -5144,7 +5144,7 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Client$Client$initModel = {count: 0, inputContent: ''};
+var $author$project$Client$Client$initModel = {inputContent: ''};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Client$Client$init = function (_v0) {
@@ -5256,12 +5256,9 @@ var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$Debug$toString = _Debug_toString;
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Client$Client$view = function (model) {
 	var styles = _List_Nil;
-	var display = $elm$html$Html$text(
-		'Count: ' + $elm$core$Debug$toString(model.count));
 	var btn = A2(
 		$elm$html$Html$button,
 		_List_fromArray(
