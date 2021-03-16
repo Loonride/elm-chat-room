@@ -5144,7 +5144,8 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Client$Client$initModel = {inputContent: ''};
+var $author$project$Shared$Interface$initState = {messages: _List_Nil, users: _List_Nil};
+var $author$project$Client$Client$initModel = {inputContent: '', state: $author$project$Shared$Interface$initState};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Client$Client$init = function (_v0) {

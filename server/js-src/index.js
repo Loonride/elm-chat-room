@@ -14,8 +14,8 @@ outputPort.subscribe((cmd) => {
 
 const obj = {
     dataType: 'connection',
-    uuid: 'abcd',
-    data: '{}',
+    uuid: uuid(),
+    data: '',
 };
 
 // const obj = {

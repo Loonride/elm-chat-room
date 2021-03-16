@@ -1,5 +1,7 @@
 port module Client.Client exposing (main)
 
+import Shared.Interface exposing (..)
+
 import Browser
 import Browser.Events
 import Json.Decode as Decode
@@ -16,9 +18,9 @@ type Msg
   | InputChange String
   | SendClick
 
-type alias Model = { inputContent: String }
+type alias Model = { inputContent: String, state: State }
 
-initModel = { inputContent = "" }
+initModel = { inputContent = "", state = initState }
 
 main : Program Flags Model Msg
 main =

@@ -1,7 +1,9 @@
 port module Server2 exposing (..)
 
+import Shared.Interface exposing (..)
+
 import Platform
-import Json.Decode as JD exposing (Decoder)
+import Json.Decode as JD
 import Json.Encode as JE
 
 type alias Flags = ()
@@ -10,13 +12,9 @@ type Msg
   = Noop
   | IncomingRawData String
 
-type alias IncomingData = { dataType: String, uuid: String, data: String }
+type alias Model = { state: State }
 
-type alias User = { uuid: String, nickname: String }
-
-type alias Model = { users: List User }
-
-initModel = { users = [] }
+initModel = { state = initState }
 
 main : Program Flags Model Msg
 main =
@@ -40,7 +38,7 @@ update msg model =
         Ok data ->
           case data.dataType of
             "connection" -> connection data model
-            "disconnection" -> (model, Cmd.none)
+            "disconnection" -> disconnection data model
             "nickname" -> (model, Cmd.none)
             "message" -> (model, Cmd.none)
             _ -> (model, Cmd.none)
@@ -52,19 +50,24 @@ subscriptions model =
     [ inputPort IncomingRawData
     ]
 
-incomingDataDecoder : Decoder IncomingData
-incomingDataDecoder =
-  JD.map3 IncomingData
-    (JD.field "dataType" JD.string)
-    (JD.field "uuid" JD.string)
-    (JD.field "data" JD.string)
-
 connection : IncomingData -> Model -> (Model, Cmd Msg)
 connection data model =
+  let
+    newUser = User data.uuid ""
+    oldState = model.state
+    newState = { oldState | users = newUser :: oldState.users }
+  in
+    ({ model | state = newState }, sendState newState)
+
+disconnection : IncomingData -> Model -> (Model, Cmd Msg)
+disconnection data model =
   let
     _ = Debug.log "connection" data.uuid
   in
     (model, Cmd.none)
+
+sendState : State -> Cmd msg
+sendState s = outputPort (JE.encode 0 (stateEncoder s))
 
 port inputPort : (String -> msg) -> Sub msg
 port outputPort : String -> Cmd msg
