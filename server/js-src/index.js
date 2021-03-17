@@ -56,7 +56,6 @@ wss.on('connection', (ws) => {
 
             // set the uuid to the user's id
             data.uuid = id;
-            console.log(data);
             inputPort.send(JSON.stringify(data));
         } catch (e) {
 

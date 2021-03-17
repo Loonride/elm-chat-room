@@ -1,0 +1,48 @@
+body {
+    font-family: Helvetica;
+    color: #222;
+}
+
+#messages-cont {
+    height: 100%;
+    position: relative;
+}
+
+#messages {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 500px;
+}
+
+input {
+    width: 300px;
+}
+
+span {
+    display: block;
+}
+
+.msg {
+    margin: 8px;
+    margin-left: 2px;
+}
+
+.nickname {
+    font-size: 12px;
+}
+
+.text {
+    font-size: 14px;
+    background-color: #ddd;
+    padding: 8px;
+    border-radius: 8px;
+    word-wrap: break-word;
+    display: inline-block;
+    max-width: 100%;
+}
+
+#main-cont {
+    position: absolute;
+    bottom: 10px;
+}

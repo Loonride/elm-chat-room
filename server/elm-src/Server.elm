@@ -80,19 +80,21 @@ nickname data model =
     oldState = model.state
     newState = { oldState | users = Dict.update data.uuid (updateNickname data.data) oldState.users }
   in
-    ({ model | state = newState }, sendState newState)
+    ({ model | state = newState }, Cmd.none)
 
 message : Data -> Model -> (Model, Cmd Msg)
 message data model =
-  case Dict.get data.uuid model.state.users of
-    Just user ->
-      let
-        oldState = model.state
-        msg = ChatMessage user data.data
-        newState = { oldState | messages = List.take 20 (msg :: oldState.messages) }
-      in
-        ({ model | state = newState }, sendState newState)
-    Nothing -> (model, Cmd.none)
+  if data.data == "" then (model, Cmd.none)
+  else
+    case Dict.get data.uuid model.state.users of
+      Just user ->
+        let
+          oldState = model.state
+          msg = ChatMessage user data.data
+          newState = { oldState | messages = List.take 20 (msg :: oldState.messages) }
+        in
+          ({ model | state = newState }, sendState newState)
+      Nothing -> (model, Cmd.none)
 
 sendState : State -> Cmd msg
 sendState s =

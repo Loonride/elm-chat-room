@@ -4,9 +4,10 @@ import Shared.Interface exposing (..)
 
 import Browser
 import Browser.Events
+import Dict
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
-import Html exposing (Html, button, input, text, div)
+import Html exposing (Html, button, input, text, div, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 
@@ -55,28 +56,40 @@ update msg model =
     SendClick ->
       ({ model | messageContent = "" }, outputPort (makeOutput "message" "" model.messageContent))
 
+userToHtml : User -> Html Msg
+userToHtml user =
+  div []
+    [ span [] [text user.uuid]
+    , span [] [text user.nickname]
+    ]
+
+messageToHtml : ChatMessage -> Html Msg
+messageToHtml msg =
+  let
+    nick = if msg.user.nickname == "" then "Unnamed" else msg.user.nickname
+  in
+    div [class "msg"]
+      [ span [class "nickname"] [text nick]
+      , span [class "text"] [text msg.text]
+      ]
+
 view : Model -> Html Msg
 view model =
     let
-      styles = []
-        -- [ ("position", "fixed")
-        -- , ("top", "50%")
-        -- , ("left", "50%")
-        -- , ("transform", "translate(-50%, -50%)")
-        -- ]
-      
       nickBox = input [ placeholder "Set nickname", value model.nicknameContent, onInput NicknameChange ] []
       msgBox = input [ placeholder "Say hello...", value model.messageContent, onInput MessageChange ] []
       btn = button [ onClick SendClick ] [ text "Send" ]
-      users = div [] [ text (Debug.toString model.state.users) ]
-      messages = div [] [ text (Debug.toString model.state.messages) ]
+
+      userList = List.map (\(_, v) -> v) (Dict.toList model.state.users)
+      users = div [] (List.map userToHtml userList)
+      onlineCount = div [] [ text ("Users online: " ++ (String.fromInt <| List.length userList)) ]
+      messages = div [id "messages-cont"] [ div [id "messages"] (List.reverse <| List.map messageToHtml model.state.messages) ]
     in
-      
-      div (List.map (\(k, v) -> style k v) styles)
-        [ div [] [nickBox]
+      div [id "main-cont"]
+        [ messages
+        , div [] [nickBox]
         , div [] [msgBox, btn]
-        , users
-        , messages
+        , onlineCount
         ]
 
 subscriptions : Model -> Sub Msg

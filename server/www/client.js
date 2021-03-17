@@ -5451,7 +5451,51 @@ var $author$project$Client$Client$NicknameChange = function (a) {
 var $author$project$Client$Client$SendClick = {$: 'SendClick'};
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$span = _VirtualDom_node('span');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Client$Client$messageToHtml = function (msg) {
+	var nick = (msg.user.nickname === '') ? 'Unnamed' : msg.user.nickname;
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('msg')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('nickname')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(nick)
+					])),
+				A2(
+				$elm$html$Html$span,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('text')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(msg.text)
+					]))
+			]));
+};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -5500,30 +5544,51 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$core$Debug$toString = _Debug_toString;
+var $author$project$Client$Client$userToHtml = function (user) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$span,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(user.uuid)
+					])),
+				A2(
+				$elm$html$Html$span,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(user.nickname)
+					]))
+			]));
+};
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Client$Client$view = function (model) {
+	var userList = A2(
+		$elm$core$List$map,
+		function (_v0) {
+			var v = _v0.b;
+			return v;
+		},
+		$elm$core$Dict$toList(model.state.users));
 	var users = A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		A2($elm$core$List$map, $author$project$Client$Client$userToHtml, userList));
+	var onlineCount = A2(
 		$elm$html$Html$div,
 		_List_Nil,
 		_List_fromArray(
 			[
 				$elm$html$Html$text(
-				$elm$core$Debug$toString(model.state.users))
+				'Users online: ' + $elm$core$String$fromInt(
+					$elm$core$List$length(userList)))
 			]));
-	var styles = _List_Nil;
 	var nickBox = A2(
 		$elm$html$Html$input,
 		_List_fromArray(
@@ -5544,11 +5609,20 @@ var $author$project$Client$Client$view = function (model) {
 		_List_Nil);
 	var messages = A2(
 		$elm$html$Html$div,
-		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$html$Html$text(
-				$elm$core$Debug$toString(model.state.messages))
+				$elm$html$Html$Attributes$id('messages-cont')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$id('messages')
+					]),
+				$elm$core$List$reverse(
+					A2($elm$core$List$map, $author$project$Client$Client$messageToHtml, model.state.messages)))
 			]));
 	var btn = A2(
 		$elm$html$Html$button,
@@ -5562,16 +5636,13 @@ var $author$project$Client$Client$view = function (model) {
 			]));
 	return A2(
 		$elm$html$Html$div,
-		A2(
-			$elm$core$List$map,
-			function (_v0) {
-				var k = _v0.a;
-				var v = _v0.b;
-				return A2($elm$html$Html$Attributes$style, k, v);
-			},
-			styles),
 		_List_fromArray(
 			[
+				$elm$html$Html$Attributes$id('main-cont')
+			]),
+		_List_fromArray(
+			[
+				messages,
 				A2(
 				$elm$html$Html$div,
 				_List_Nil,
@@ -5582,8 +5653,7 @@ var $author$project$Client$Client$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[msgBox, btn])),
-				users,
-				messages
+				onlineCount
 			]));
 };
 var $author$project$Client$Client$main = $elm$browser$Browser$element(
