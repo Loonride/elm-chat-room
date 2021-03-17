@@ -9,7 +9,7 @@ const elmApp = require('../elm-output/server').Elm.Server.init({
 });
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 app.use(express.static(path.resolve(__dirname, '../www')));
 const server = http.createServer(app);
 
