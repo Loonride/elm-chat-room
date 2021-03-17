@@ -5208,17 +5208,17 @@ var $author$project$Shared$Interface$dataEncoder = function (data) {
 				$elm$json$Json$Encode$string(data.data))
 			]));
 };
-var $author$project$Shared$Interface$simpleDataEncoder = F2(
-	function (dataType, containedData) {
-		var finalData = A3($author$project$Shared$Interface$Data, dataType, '', containedData);
+var $author$project$Shared$Interface$simpleDataEncoder = F3(
+	function (dataType, uuid, containedData) {
+		var finalData = A3($author$project$Shared$Interface$Data, dataType, uuid, containedData);
 		return $author$project$Shared$Interface$dataEncoder(finalData);
 	});
-var $author$project$Shared$Interface$makeOutput = F2(
-	function (dataType, data) {
+var $author$project$Shared$Interface$makeOutput = F3(
+	function (dataType, uuid, data) {
 		return A2(
 			$elm$json$Json$Encode$encode,
 			0,
-			A2($author$project$Shared$Interface$simpleDataEncoder, dataType, data));
+			A3($author$project$Shared$Interface$simpleDataEncoder, dataType, uuid, data));
 	});
 var $author$project$Client$Client$outputPort = _Platform_outgoingPort('outputPort', $elm$json$Json$Encode$string);
 var $author$project$Shared$Interface$State = F2(
@@ -5432,12 +5432,14 @@ var $author$project$Client$Client$update = F2(
 						model,
 						{nicknameContent: s}),
 					$author$project$Client$Client$outputPort(
-						A2($author$project$Shared$Interface$makeOutput, 'nickname', s)));
+						A3($author$project$Shared$Interface$makeOutput, 'nickname', '', s)));
 			default:
 				return _Utils_Tuple2(
-					model,
+					_Utils_update(
+						model,
+						{messageContent: ''}),
 					$author$project$Client$Client$outputPort(
-						A2($author$project$Shared$Interface$makeOutput, 'message', model.messageContent)));
+						A3($author$project$Shared$Interface$makeOutput, 'message', '', model.messageContent)));
 		}
 	});
 var $author$project$Client$Client$MessageChange = function (a) {

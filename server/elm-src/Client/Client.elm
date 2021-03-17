@@ -51,9 +51,9 @@ update msg model =
     MessageChange s ->
       ({ model | messageContent = s }, Cmd.none)
     NicknameChange s ->
-      ({ model | nicknameContent = s }, outputPort (makeOutput "nickname" s))
+      ({ model | nicknameContent = s }, outputPort (makeOutput "nickname" "" s))
     SendClick ->
-      (model, outputPort (makeOutput "message" model.messageContent))
+      ({ model | messageContent = "" }, outputPort (makeOutput "message" "" model.messageContent))
 
 view : Model -> Html Msg
 view model =

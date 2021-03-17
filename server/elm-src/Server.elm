@@ -33,15 +33,15 @@ update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Noop ->
-      (model, outputPort "abc")
+      (model, Cmd.none)
     IncomingRawData s ->
       case JD.decodeString dataDecoder s of
         Ok data ->
           case data.dataType of
             "connection" -> connection data model
             "disconnection" -> disconnection data model
-            "nickname" -> (model, Cmd.none)
-            "message" -> (model, Cmd.none)
+            "nickname" -> nickname data model
+            "message" -> message data model
             _ -> (model, Cmd.none)
         Err e -> (model, Cmd.none)
 
@@ -68,12 +68,38 @@ disconnection data model =
   in
     ({ model | state = newState }, sendState newState)
 
+updateNickname : String -> Maybe User -> Maybe User
+updateNickname nick maybeUser =
+  case maybeUser of
+    Just u -> Just { u | nickname = nick}
+    Nothing -> Nothing
+
+nickname : Data -> Model -> (Model, Cmd Msg)
+nickname data model =
+  let
+    oldState = model.state
+    newState = { oldState | users = Dict.update data.uuid (updateNickname data.data) oldState.users }
+  in
+    ({ model | state = newState }, sendState newState)
+
+message : Data -> Model -> (Model, Cmd Msg)
+message data model =
+  case Dict.get data.uuid model.state.users of
+    Just user ->
+      let
+        oldState = model.state
+        msg = ChatMessage user data.data
+        newState = { oldState | messages = List.take 20 (msg :: oldState.messages) }
+      in
+        ({ model | state = newState }, sendState newState)
+    Nothing -> (model, Cmd.none)
+
 sendState : State -> Cmd msg
 sendState s =
   let
     stateData = JE.encode 0 (stateEncoder s)
   in
-    outputPort (makeOutput "state" stateData)
+    outputPort (makeOutput "state" "" stateData)
 
 port inputPort : (String -> msg) -> Sub msg
 port outputPort : String -> Cmd msg

@@ -31,10 +31,10 @@ dataEncoder data =
     , ( "data", JE.string data.data )
     ]
 
-simpleDataEncoder : String -> String -> Value
-simpleDataEncoder dataType containedData =
+simpleDataEncoder : String -> UUID -> String -> Value
+simpleDataEncoder dataType uuid containedData =
   let
-    finalData = Data dataType "" containedData
+    finalData = Data dataType uuid containedData
   in
     dataEncoder finalData
 
@@ -77,5 +77,5 @@ stateEncoder state =
     , ( "messages", JE.list chatMessageEncoder state.messages )
     ]
 
-makeOutput : String -> String -> String
-makeOutput dataType data = (JE.encode 0 (simpleDataEncoder dataType data))
+makeOutput : String -> UUID -> String -> String
+makeOutput dataType uuid data = (JE.encode 0 (simpleDataEncoder dataType uuid data))
