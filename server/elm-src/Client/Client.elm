@@ -45,6 +45,8 @@ update msg model =
     IncomingRawData s ->
       case JD.decodeString dataDecoder s of
         Ok data ->
+          -- other message types could go here, but I chose to only send and handle a
+          -- full state update message
           case data.dataType of
             "state" -> (updateState model data.data, Cmd.none)
             _ -> (model, Cmd.none)
@@ -98,6 +100,7 @@ subscriptions model =
     [ inputPort IncomingRawData
     ]
 
+-- update the local state based on a state update sent from the server
 updateState : Model -> String -> Model
 updateState model rawStateData =
   case JD.decodeString stateDecoder rawStateData of

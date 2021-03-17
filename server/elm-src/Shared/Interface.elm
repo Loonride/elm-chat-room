@@ -1,5 +1,7 @@
 module Shared.Interface exposing (..)
 
+-- this module contains shared logic that both the server and client use
+
 import Dict
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE exposing (Value)
@@ -12,6 +14,8 @@ type alias User = { uuid: UUID, nickname: String }
 
 type alias ChatMessage = { user: User, text: String }
 
+-- the server keeps track of an authoritative state which is sent to all the clients
+-- when there are updates
 type alias State = { users: Dict.Dict UUID User, messages: List ChatMessage }
 
 initState = { users = Dict.empty, messages = [] }

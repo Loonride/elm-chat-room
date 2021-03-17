@@ -37,6 +37,8 @@ update msg model =
     IncomingRawData s ->
       case JD.decodeString dataDecoder s of
         Ok data ->
+          -- handle connection data sent from the WebSocket server, as well
+          -- as nickname/message data sent by clients
           case data.dataType of
             "connection" -> connection data model
             "disconnection" -> disconnection data model
@@ -71,7 +73,7 @@ disconnection data model =
 updateNickname : String -> Maybe User -> Maybe User
 updateNickname nick maybeUser =
   case maybeUser of
-    Just u -> Just { u | nickname = nick}
+    Just u -> Just { u | nickname = nick }
     Nothing -> Nothing
 
 nickname : Data -> Model -> (Model, Cmd Msg)
@@ -82,6 +84,7 @@ nickname data model =
   in
     ({ model | state = newState }, Cmd.none)
 
+-- add a new incoming message, then take only the latest 20 messages
 message : Data -> Model -> (Model, Cmd Msg)
 message data model =
   if data.data == "" then (model, Cmd.none)
@@ -96,6 +99,7 @@ message data model =
           ({ model | state = newState }, sendState newState)
       Nothing -> (model, Cmd.none)
 
+-- sends the full state to all the connected clients
 sendState : State -> Cmd msg
 sendState s =
   let

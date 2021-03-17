@@ -68,6 +68,7 @@ wss.on('connection', (ws) => {
     });
 });
 
+// this broadcasts a message to all connected clients
 outputPort.subscribe((s) => {
     Object.keys(users).forEach(key => {
         const ws = users[key];
